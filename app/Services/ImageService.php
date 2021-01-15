@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Image;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ImageService
 {
@@ -14,6 +15,26 @@ class ImageService
     public function __construct(FileUploader $uploader)
     {
         $this->uploader = $uploader;
+    }
+
+    /**
+     * @param $options
+     * @return LengthAwarePaginator
+     */
+    public function find($options): LengthAwarePaginator
+    {
+        $q = Image::query();
+
+        if (!empty($options['user_id'])) {
+            $q->where('user_id', $options['user_id']);
+        } elseif (!empty($options['withUsers'])) {
+            $q->leftJoin('users', 'images.user_id', '=', 'users.id')
+                ->select('images.*', 'users.first_name', 'users.last_name');
+        }
+
+        $q->orderBy('created_at', ($options['sort_created_at'] ?? -1) === 1 ? 'asc' : 'desc');
+
+        return $q->paginate();
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Http\Requests\API\CreateImageRequest;
 use App\Http\Resources\ImageResource;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ImageController extends Controller
 {
@@ -18,6 +19,19 @@ class ImageController extends Controller
     public function __construct(ImageService $imageService)
     {
         $this->imageService = $imageService;
+    }
+
+    /**
+     * @param Request $request
+     * @return AnonymousResourceCollection
+     */
+    public function index(Request $request): AnonymousResourceCollection
+    {
+        return ImageResource::collection($this->imageService->find([
+            'user_id' => $request->input('user_id'),
+            'sort_created_at' => (int)$request->input('sort_created_at'),
+            'withUsers' => true,
+        ]));
     }
 
     /**
