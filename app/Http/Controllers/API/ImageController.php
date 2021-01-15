@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\CreateImageRequest;
+use App\Http\Requests\API\UpdateImageRequest;
 use App\Http\Resources\ImageResource;
 use App\Services\ImageService;
+use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -45,6 +47,28 @@ class ImageController extends Controller
         $data['user'] = $request->user();
 
         $image = $this->imageService->create($data);
+
+        return new ImageResource($image);
+    }
+
+    /**
+     * @param $id
+     * @param UpdateImageRequest $request
+     * @return ImageResource
+     */
+    public function update($id, UpdateImageRequest $request): ImageResource
+    {
+        $image = $this->imageService->findById($id);
+
+        if(!$image) {
+            abort(404);
+        }
+
+        Gate::authorize('update-image', $image);
+
+        $data = $request->validated();
+
+        $this->imageService->update($image, $data);
 
         return new ImageResource($image);
     }

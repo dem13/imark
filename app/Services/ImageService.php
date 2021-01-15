@@ -18,10 +18,10 @@ class ImageService
     }
 
     /**
-     * @param $options
+     * @param array $options
      * @return LengthAwarePaginator
      */
-    public function find($options): LengthAwarePaginator
+    public function find(array $options): LengthAwarePaginator
     {
         $q = Image::query();
 
@@ -38,9 +38,20 @@ class ImageService
     }
 
     /**
-     * @param array $data
+     * @param $id
+     * @return Image|null
      */
-    public function create(array $data)
+    public function findById($id): ?Image
+    {
+        return Image::find($id);
+    }
+
+    /**
+     *
+     * @param array $data
+     * @return Image
+     */
+    public function create(array $data): Image
     {
         $image = new Image();
 
@@ -56,14 +67,30 @@ class ImageService
      * @param array $data
      * @return Image
      */
-    private function fill(Image $image, array $data)
+    private function fill(Image $image, array $data): Image
     {
-        $data['path'] = $this->uploader->upload($data['image']);
+        if(isset($data['image'])) {
+            $data['path'] = $this->uploader->upload($data['image']);
+        }
 
         $image->fill($data);
 
-        $image->user()->associate($data['user']);
+        if($data['user'] ?? false) {
+            $image->user()->associate($data['user']);
+        }
 
         return $image;
+    }
+
+    /**
+     * @param Image $image
+     * @param array $data
+     * @return bool
+     */
+    public function update(Image $image, array $data): bool
+    {
+        $this->fill($image, $data);
+
+        return $image->save();
     }
 }

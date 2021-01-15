@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('image')->group(function () {
         Route::get('/', 'ImageController@index');
         Route::post('/', 'ImageController@store');
+        Route::put('/{id}', 'ImageController@update');
     });
 });
 
