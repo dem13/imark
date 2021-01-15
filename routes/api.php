@@ -21,4 +21,11 @@ Route::group([
     Route::post('/register', 'RegisterController@register');
 });
 
-Route::get('/account', 'AccountController@index')->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/account', 'AccountController@index');
+
+    Route::prefix('image')->group(function () {
+        Route::post('/', 'ImageController@store');
+    });
+});
+
