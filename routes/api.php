@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', 'ImageController@index');
         Route::post('/', 'ImageController@store');
         Route::put('/{id}', 'ImageController@update');
+        Route::delete('/{id}', 'ImageController@delete');
     });
 });
 

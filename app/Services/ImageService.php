@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Image;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Storage;
 
 class ImageService
 {
@@ -65,6 +67,35 @@ class ImageService
     /**
      * @param Image $image
      * @param array $data
+     * @return bool
+     */
+    public function update(Image $image, array $data): bool
+    {
+        $this->fill($image, $data);
+
+        return $image->save();
+    }
+
+    /**
+     * @param Image $image
+     * @return bool|null
+     */
+    public function delete(Image $image): ?bool
+    {
+        try {
+            $deleted = $image->delete();
+
+            Storage::disk('public')->delete($image->path);
+
+            return $deleted;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param Image $image
+     * @param array $data
      * @return Image
      */
     private function fill(Image $image, array $data): Image
@@ -80,17 +111,5 @@ class ImageService
         }
 
         return $image;
-    }
-
-    /**
-     * @param Image $image
-     * @param array $data
-     * @return bool
-     */
-    public function update(Image $image, array $data): bool
-    {
-        $this->fill($image, $data);
-
-        return $image->save();
     }
 }

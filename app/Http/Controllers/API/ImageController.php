@@ -72,4 +72,27 @@ class ImageController extends Controller
 
         return new ImageResource($image);
     }
+
+    /**
+     * @param $id
+     * @return string[]|void
+     */
+    public function delete($id)
+    {
+        $image = $this->imageService->findById($id);
+
+        if(!$image) {
+            abort(404);
+        }
+
+        Gate::authorize('delete-image', $image);
+
+        if($this->imageService->delete($image)) {
+            return [
+                'message' => 'Deleted'
+            ];
+        }
+
+        abort(400, 'Unable to delete');
+    }
 }

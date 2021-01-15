@@ -30,5 +30,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('update-image', function (User $user, Image $image) {
             return $user->id === $image->user_id;
         });
+
+        Gate::define('delete-image', function (User $user, Image $image) {
+            return $user->id === $image->user_id;
+        });
     }
 }
